@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="300 seconds">
+	<property name="LOG_HOME" value="/opt/tingyun/es-migration/logs" />
+	<property name="HISTORY_LOG_HOME" value="/opt/tingyun/es-migration/logs/history_logs" />
+	<property name="LOG_FILE_NAME_PREFIX" value="${appName}" />
+	<property name="LOG_PATTERN" value="%d{MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n" />
+	<!--<property name="URI_FILTER_LOG_PATTERN" value="%d{HH:mm:ss} %msg%n" />-->
+	<!--<property name="HOST_FILTER_FILE_NAME_PREFIX" value="host_filter_nonmatch" />-->
+	<!--<property name="URI_FILTER_FILE_NAME_PREFIX" value="uri_filter_nonmatch" />-->
+	
+	<appender name="sysout" class="ch.qos.logback.core.rolling.RollingFileAppender">  
+        <file>${LOG_HOME}/${LOG_FILE_NAME_PREFIX}.sysout.log</file>  
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        	<fileNamePattern>${HISTORY_LOG_HOME}/%d{yyyyMMdd}/${LOG_FILE_NAME_PREFIX}.sysout.log</fileNamePattern>
+            <maxHistory>60</maxHistory>
+        </rollingPolicy>  
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">  
+            <pattern>%d{MM-dd HH:mm:ss} [%thread] - %msg%n</pattern>  
+        </encoder>  
+    </appender>
+    
+   	<appender name="syserr" class="ch.qos.logback.core.rolling.RollingFileAppender">  
+        <file>${LOG_HOME}/${LOG_FILE_NAME_PREFIX}.syserr.log</file>  
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">            
+        	<fileNamePattern>${HISTORY_LOG_HOME}/%d{yyyyMMdd}/${LOG_FILE_NAME_PREFIX}.syserr.log</fileNamePattern>
+            <maxHistory>60</maxHistory>
+        </rollingPolicy>  
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">  
+            <pattern>%d{MM-dd HH:mm:ss} [%thread] - %msg%n</pattern>  
+        </encoder>  
+    </appender>
+
+	<appender name="appenderAll" class="ch.qos.logback.core.rolling.RollingFileAppender">  
+        <file>${LOG_HOME}/${LOG_FILE_NAME_PREFIX}.log</file>  
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+             <fileNamePattern>${LOG_HOME}/${LOG_FILE_NAME_PREFIX}.%i.log</fileNamePattern>
+             <minIndex>1</minIndex>
+             <maxIndex>3</maxIndex>
+        </rollingPolicy>  
+         <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+               <maxFileSize>100MB</maxFileSize>
+          </triggeringPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">  
+            <pattern>${LOG_PATTERN}</pattern>  
+        </encoder>  
+    </appender>
+    
+    <appender name="appenderError" class="ch.qos.logback.core.rolling.RollingFileAppender">  
+        <file>${LOG_HOME}/${LOG_FILE_NAME_PREFIX}-error.log</file>  
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${HISTORY_LOG_HOME}/%d{yyyyMMdd}/${LOG_FILE_NAME_PREFIX}-error.%i.log</fileNamePattern>
+            <maxHistory>60</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>100MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+	    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>ERROR</level>
+	    </filter>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">  
+            <pattern>${LOG_PATTERN}</pattern>  
+        </encoder>  
+    </appender>
+    
+	<appender name="appenderHostFilterLog" class="ch.qos.logback.core.rolling.RollingFileAppender">  
+        <file>${LOG_HOME}/${HOST_FILTER_FILE_NAME_PREFIX}.log</file>  
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">  
+            <fileNamePattern>${LOG_HOME}/%d{yyyyMMdd}/${HOST_FILTER_FILE_NAME_PREFIX}.%i.log</fileNamePattern>
+            <maxHistory>2</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>200MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>  
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">  
+            <pattern>${URI_FILTER_LOG_PATTERN}</pattern>  
+        </encoder>  
+    </appender>
+    
+	<appender name="appenderUriFilterLog" class="ch.qos.logback.core.rolling.RollingFileAppender">  
+        <file>${LOG_HOME}/${URI_FILTER_FILE_NAME_PREFIX}.log</file>  
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">  
+            <fileNamePattern>${LOG_HOME}/%d{yyyyMMdd}/${URI_FILTER_FILE_NAME_PREFIX}.%i.log</fileNamePattern>
+            <maxHistory>2</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>200MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>  
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">  
+            <pattern>${URI_FILTER_LOG_PATTERN}</pattern>  
+        </encoder>  
+    </appender>
+    
+	<root level="INFO">
+		<appender-ref ref="appenderAll" />
+		<appender-ref ref="appenderError" />
+	</root>
+	
+	<logger name="com.networkbench" level="DEBUG"/>
+	<!--<logger name="host_filter_log" level="TRACE" additivity="false">-->
+    	<!--<appender-ref ref="appenderHostFilterLog" />-->
+  	<!--</logger>-->
+  	<!--<logger name="uri_filter_log" level="TRACE" additivity="false">-->
+    	<!--<appender-ref ref="appenderUriFilterLog" />-->
+  	<!--</logger>-->
+  	
+	<logger name="System.out" level="DEBUG">
+		<appender-ref ref="sysout" />
+	</logger>
+	<logger name="System.err" level="DEBUG">
+		<appender-ref ref="syserr" />
+	</logger>
+</configuration>
